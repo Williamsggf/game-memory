@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Jogo da memória criado por William Soares Gonçalves. Curso da Dio">
+    <link rel="stylesheet" href="./src/styles/styles.css">
+    <link rel="stylesheet" href="./src/styles/reset.css">
+    <title>Jogo da Memória</title>
+</head>
+<body>
+    <div class="menu">
+        <div class="menu-time">
+            <h2 class="m-title">Tempo</h2>
+            <h2 id="time-left">0</h2>
+        </div>
+        <div class="menu-levels">
+            <h2 class="m-title">Nível</h2>
+            <h2 id="level">1</h2>
+        </div>
+        <div class="menu-score">
+            <h2 class="m-title">Pontuação</h2>
+            <h2 id="score">0</h2> <!-- Corrigido o ID aqui removendo aspas a mais -->
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>Jogo da Memória</h2>
+        <div class="game"></div>
+        <div class="scores">
+            <h2>As melhores Pontuações:</h2>
+            <table id="scores-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Level</th>
+                        <th>Pontuação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <button class="reset" onclick="buttonReset()">Reiniciar Jogo</button>
+    </div>
+
+    <!-- Modal de início do jogo -->
+
+    <footer>
+        <p>Recriação do Jogo da Memória feito na <a href="https://www.dio.me/" target="_blank">Dio.me</a></p>
+        <p>Recriado por William Soares Gonçalves <a href="https://portifolio.wgconsultec.app.br" target="_blank">Portfólio</a></p>
+    </footer>
+
+    <script src="./src/scripts/script.js" defer></script>
+</body>
+</html>
