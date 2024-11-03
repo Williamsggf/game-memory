@@ -15,12 +15,20 @@ const state = {
 };
 
 const allEmojis = [
-    "😘", "😃", "😎", "😨", "😡", "🤢", "🤪", "😵", "😇", "🥳",
-    "😋", "😐", "😴", "🥶", "😤", "😈", "💩", "🤡", "😷", "🤑",
-    "🤥", "🤧", "🤯", "🤫", "😪", "🤔", "🤖", "👻", "🎃", "😺",
-    "❤️", "😍", "😁", "🤩", "👽", "🙀", "🙊", "🦝", "🦒", "🐺",
-    "🐰", "🐨", "🐼", "🐼", "🦄", "🐲", "🐻‍❄️", "🦧", "🐘", "🦏",
-    "🦥", "🐊", "🍕", "🌭", "🍔", "🍦", "🥐", "🍘", "🍙", "🍲",
+    { emoji: "⚽", partes: ["BO", "LA"] }, { emoji: "🚗", partes: ["CA", "RRO"] },
+    { emoji: "🍎", partes: ["MA", "ÇA"] }, { emoji: "🏠", partes: ["CA", "SA"] },
+    { emoji: "🔥", partes: ["FO", "GO"] }, { emoji: "🔪", partes: ["FA", "CA"] },
+    { emoji: "🐱", partes: ["GA", "TO"] }, { emoji: "🍰", partes: ["BO", "LO"] },
+    { emoji: "🐄", partes: ["VA", "CA"] }, { emoji: "🍬", partes: ["BA", "LA"] },
+    { emoji: "👄", partes: ["BO", "CA"] }, { emoji: "🧃", partes: ["SU", "CO"] },
+    { emoji: "🐸", partes: ["SA", "PO"] }, { emoji: "🦆", partes: ["PA", "TO"] },
+    { emoji: "🐷", partes: ["POR", "CO"] }, { emoji: "🐀", partes: ["RA", "TO"] },
+    { emoji: "🐓", partes: ["GA", "LO"] }, { emoji: "🐍", partes: ["CO", "BRA"] },
+    { emoji: "🌽", partes: ["MI", "LHO"] }, { emoji: "🛞", partes: ["RO", "DA"] },
+    { emoji: "🦭", partes: ["FO", "CA"] }, { emoji: "⛵", partes: ["BAR", "CO"] },
+    { emoji: "🚪", partes: ["POR", "TA"] }, { emoji: "📺", partes: ["TE", "VE"] },
+    { emoji: "🥛", partes: ["CO", "PO"] }, { emoji: "🛋️", partes: ["SO", "FA"] },
+    { emoji: "🛏️", partes: ["CA", "MA"] }, { emoji: "🏦", partes: ["BAN", "CO"] },
 ];
 
 // Função para tocar som
@@ -87,8 +95,9 @@ function resetGame() {
     state.values.currentTime = Math.max(30, 180 - (state.values.level - 1) * 30);
     state.values.pontAcert = 1 + state.values.level;
     state.view.level.textContent = state.values.level;
-    state.view.timeLeft.textContent = state.values.currentTime;
+    state.view.score.textContent += state.values.timer;
     state.view.score.textContent = Math.floor(state.values.score); // Garantir números inteiros
+    state.view.timeLeft.textContent = state.values.currentTime;
     state.view.game.innerHTML = ''; // Limpa o jogo para reiniciar
     sortEmojis();
 }
@@ -115,20 +124,24 @@ function shuffleArray(array) {
 
 // Seleciona 8 emojis aleatórios e duplica-os para criar pares
 function sortEmojis() {
-    let selectedEmojis = shuffleArray(allEmojis).slice(0, 8);
-    let gameEmojis = shuffleArray([...selectedEmojis, ...selectedEmojis]);
+    let selectedEmojis = shuffleArray(allEmojis).slice(0, 8); // Seleciona 4 emojis diferentes para um total de 8 peças
+    let gameEmojis = selectedEmojis.flatMap(item => [
+        { emoji: item.emoji, texto: item.partes[0] },
+        { emoji: item.emoji, texto: item.partes[1] }
+    ]);
+    gameEmojis = shuffleArray(gameEmojis); // Embaralha o array
 
     if (state.view.game) {
-        gameEmojis.forEach(emoji => {
+        gameEmojis.forEach(item => {
             let box = document.createElement("div");
             box.className = "item";
-            box.innerHTML = emoji;
+            box.innerHTML = `${item.emoji}${item.texto}`;
+            box.dataset.emoji = item.emoji; // Guarda o emoji para a verificação
             box.onclick = handleClick;
             state.view.game.appendChild(box);
         });
     }
 }
-
 // Array para armazenar os cartões abertos atualmente
 let openCards = [];
 
@@ -149,28 +162,42 @@ function handleClick() {
 }
 
 // Função para verificar se os cartões abertos correspondem
+// Função para verificar se os cartões abertos correspondem
 function checkMatch() {
-    if (openCards[0].innerHTML === openCards[1].innerHTML) {
-        openCards[0].classList.add("boxMatch");
-        openCards[1].classList.add("boxMatch");
+    const [firstCard, secondCard] = openCards;
 
-        state.values.score += state.values.pontAcert;
-        state.values.pontAcert++;
+    // Verifica correspondência pelo dataset (emoji)
+    if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+        // Marcar como correspondência
+        firstCard.classList.add("boxMatch");
+        secondCard.classList.add("boxMatch");
+
+        // Incrementa a pontuação com base no nível atual
+        state.values.score += state.values.pontAcert; // Pontuação aumenta com base no nível
         state.view.score.textContent = Math.floor(state.values.score);
+
+        // Reproduz som de acerto
         playSound('hit.m4a');
 
     } else {
-        openCards[0].classList.remove("boxOpen");
-        openCards[1].classList.remove("boxOpen");
+        // Se não houver correspondência, desfaz a seleção
+        firstCard.classList.remove("boxOpen");
+        secondCard.classList.remove("boxOpen");
+
+        // Reproduz som de erro
         playSound('buzzer.mp3');
     }
+
+    // Reseta o array de cartões abertos para a próxima jogada
     openCards = [];
 
+    // Checa se todos os pares foram encontrados para avançar o nível
     if (document.querySelectorAll(".boxMatch").length === document.querySelectorAll(".item").length) {
         clearInterval(state.values.timer);
-        //alert(`Nível ${state.values.level} concluído em ${180 - state.values.currentTime} segundos!`);
+        state.values.score += Math.floor((state.values.currentTime / 2) * state.values.level);
+        state.view.score.textContent = Math.floor(state.values.score);
         state.values.level++;
-        startGame();
+        startGame(); // Inicia o próximo nível
     }
 }
 
@@ -221,26 +248,26 @@ function modalGameOver() {
 function saveScore(nome, level, score) {
     const scoreData = { nome, level, score };
 
-    fetch('https://app-gestao-backend.vercel.app/auth/RscoresGM', {
+    fetch('https://app-gestao-backend.vercel.app/auth/RscoresGMeducSlb', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(scoreData)
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Erro ao salvar a pontuação');
-        return response.json();
-    })
-    .then(data => {
-        alert("Pontuação salva com sucesso!");
-        displayScores(); // Atualiza a lista de pontuações
-    })
-    .catch(error => console.error('Erro ao salvar a pontuação:', error));
+        .then(response => {
+            if (!response.ok) throw new Error('Erro ao salvar a pontuação');
+            return response.json();
+        })
+        .then(data => {
+            alert("Pontuação salva com sucesso!");
+            displayScores(); // Atualiza a lista de pontuações
+        })
+        .catch(error => console.error('Erro ao salvar a pontuação:', error));
 }
 
 
 // Exibe a lista de pontuações
 function displayScores() {
-    fetch('https://app-gestao-backend.vercel.app/auth/CscoresGM')
+    fetch('https://app-gestao-backend.vercel.app/auth/CscoresGMeducSlb')
         .then(response => {
             if (!response.ok) {
                 throw new Error("Erro na resposta da rede.");

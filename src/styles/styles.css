@@ -184,7 +184,7 @@ footer {
     .item {
         width: calc(25% - 10px); /* Três colunas no tablet */
         height: 70px;
-        font-size: 3.5em;
+        font-size: 2em;
     }
 
     h2 {
