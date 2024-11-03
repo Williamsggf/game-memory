@@ -23,6 +23,13 @@ const allEmojis = [
     "🦥", "🐊", "🍕", "🌭", "🍔", "🍦", "🥐", "🍘", "🍙", "🍲",
 ];
 
+// Função para tocar som
+function playSound(audioName) {
+    let audio = new Audio(`./src/audios/${audioName}`);
+    audio.volume = 0.1;
+    audio.play();
+}
+
 // Função para criar e exibir o modal de início
 function createStartModal() {
     // Remove o modal anterior, se existir
@@ -150,10 +157,12 @@ function checkMatch() {
         state.values.score += state.values.pontAcert;
         state.values.pontAcert++;
         state.view.score.textContent = Math.floor(state.values.score);
+        playSound('hit.m4a');
 
     } else {
         openCards[0].classList.remove("boxOpen");
         openCards[1].classList.remove("boxOpen");
+        playSound('buzzer.mp3');
     }
     openCards = [];
 
