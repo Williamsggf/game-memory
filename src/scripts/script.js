@@ -168,7 +168,8 @@ function checkMatch() {
 
     if (document.querySelectorAll(".boxMatch").length === document.querySelectorAll(".item").length) {
         clearInterval(state.values.timer);
-        //alert(`Nível ${state.values.level} concluído em ${180 - state.values.currentTime} segundos!`);
+        state.values.score += Math.floor((state.values.currentTime / 2) * state.values.level);
+        state.view.score.textContent = Math.floor(state.values.score);
         state.values.level++;
         startGame();
     }
